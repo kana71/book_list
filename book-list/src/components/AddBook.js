@@ -2,16 +2,6 @@ import { elementType } from 'prop-types';
 import React, { Component } from 'react'
 import Book from '../models/Book';
 
-// export default class AddBook extends Component {
-//     render() {
-//         return (
-//             <div>
-//                 I add the task
-//             </div>
-//         )
-//     }
-// }
-
 
 export default class AddBook extends Component {
 
@@ -31,9 +21,19 @@ export default class AddBook extends Component {
         this.setState({ name: '', author: '', isbn: ''})
     }
 
-    onInputchanged(e) {
-        this.setState({ name: e.target.value, author: e.target.value, isbn: e.target.value })
+    onNameInputChanged(e) {
+        this.setState({ name: e.target.value })
     }
+
+    onAuthorInputChanged(e) {
+        this.setState({ author: e.target.value })
+    }
+
+    onIsbnInputChanged(e) {
+        this.setState({ isbn: e.target.value })
+    }
+
+
 
 
     render() {
@@ -45,7 +45,7 @@ export default class AddBook extends Component {
                 <div className="input-group mb-3">
                     <input 
                         value={this.state.name}
-                        onChange={(e) => this.onInputChanged(e)}
+                        onChange={(e) => this.onNameInputChanged(e)}
                         type="text" 
                         className="form-control" 
                         placeholder="Title" />
@@ -56,7 +56,7 @@ export default class AddBook extends Component {
                 <div className="input-group mb-3">
                     <input 
                         value={this.state.author}
-                        onChange={(e) => this.onInputChanged(e)}
+                        onChange={(e) => this.onAuthorInputChanged(e)}
                         type="text" 
                         className="form-control" 
                         placeholder="Author" />
@@ -67,7 +67,7 @@ export default class AddBook extends Component {
                 <div className="input-group mb-3">
                     <input 
                         value={this.state.isbn}
-                        onChange={(e) => this.onInputChanged(e)}
+                        onChange={(e) => this.onIsbnInputChanged(e)}
                         type="number" 
                         className="form-control" 
                         placeholder="ISBN#" />
