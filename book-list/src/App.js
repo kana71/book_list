@@ -17,21 +17,60 @@ class App extends Component {
   constructor(props) {
     super(props); 
 
-    let booksString = localStorage.getItem('books');
-    booksString = booksString ? booksString : '[]'; 
-    const books = JSON.parse(booksString);
+    this.db = firebase.firestore();
 
-    this.state = { books: books}; 
+    // let booksString = localStorage.getItem('books');
+    // booksString = booksString ? booksString : '[]'; 
+    // const books = JSON.parse(booksString);
+
+    // this.state = { books: books}; 
+
+    this.state = { tasks: [] }; 
+  };
+
+  componentDidMount() {
+    this.fetchTasks();
   }
 
-  saveBooksState(books) {
-    this.setState({ books: books }); 
-    localStorage.setItem('books', JSON.stringify(books));
+  async fetchTasks() {
+    try {
+
+      const snapshot = await this.db.collection('books').get(); 
+      const books = snapshot.docs.map(doc => Book.fromDocment(doc));
+
+      this.setState({ books: books });
+      console.log(books);
+
+    } catch(err) {
+      console.log(err);
+    }
   }
 
-  onBookCreated(book) {
-    this.state.books.push(book); 
-    this.saveBooksState(this.state.books);
+  // saveBooksState(books) {
+  //   this.setState({ books: books }); 
+  //   localStorage.setItem('books', JSON.stringify(books));
+  // }
+
+  async onBookCreated(book) {
+    console.log(book); 
+
+    try {
+      const docRef = this.db.collection('books').doc(); 
+      await docRef.set({
+        name: book.name, 
+        author: book.author, 
+        isbn: book.isbn, 
+      }); 
+
+      book.id = docRef.id 
+      this.state.books.push(book); 
+      this.setState( { books: this.state.books });
+    } catch(err) {
+      console.log(err)
+    }
+
+    // this.state.books.push(book); 
+    // this.saveBooksState(this.state.books);
   }
 
   // onBookUpdated(book) {
@@ -40,13 +79,18 @@ class App extends Component {
 
   
 
-  onBookRemoved(bookId) {
-    const updatedBookArr = this.state.books.filter(book => book.id !== bookId); 
+  async onBookRemoved(bookId) {
 
-    this.saveBooksState(updatedBookArr)
+    try {
+      await this.db.collection('books').doc(bookId).delete();
 
+      const updatedBookArr = this.state.books.filter(book => book.id !== bookId); 
+      this.saveBooksState({ books: updatedBookArr });
+
+    } catch(err) {
+      console.log(err);
+    }
   }
-
 
 
 
@@ -64,7 +108,7 @@ class App extends Component {
 
         <BookTable 
         books={this.state.books}
-        bookUpdated={(bookId) => this.onBookUpdate(bookId)}
+        // bookUpdated={(bookId) => this.onBookUpdate(bookId)}
         bookRemoved={(bookId) => this.onBookRemoved(bookId)}
         />
       
